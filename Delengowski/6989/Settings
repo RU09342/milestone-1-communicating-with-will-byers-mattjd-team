@@ -21,19 +21,63 @@ int main(void)
  	 
 }
 
+#pragma vector = TIMERB0_VECTOR
+__interrupt void TB0_ISR(void)
+{
+	switch(TBIV)
+	{
+		case TB0IV_NONE   :
+		{
 
+			break;
+		}           
+		case TB0IV_TBCCR1 :
+		{
+
+			break;
+		}           
+		case TB0IV_TBCCR2 :
+		{
+
+			break;
+		}           
+		case TB0IV_TBCCR3 :
+		{
+
+			break;
+		}           
+		case TB0IV_TBCCR4 :
+		{
+
+			break;
+		}           
+		case TB0IV_TBCCR5 :
+		{
+
+			break;
+		}           
+		case TB0IV_TBCCR6 :
+		{
+
+			break;
+		}           
+		case TB0IV_TBIFG  :
+		{
+
+			break;
+		}  
+	}         
+}
 
 void TimerB0Setup()
 {
 	TB0CCR0 = 255;							  // Count Up To 
 	TB0CTL |= TBSSEL_2 + MC_1 + TBCLR;		  // SMCLK (1MHz) Up Mode Clear Timer
-	TB0CCR3 = ;								  // RED LED DUTY CYCLE
-	TB0CCR4 = ;								  // GREEN LED DUTY CYCLE
-	TB0CCR5 = ; 							  // BLUE LED DUTY CYCLE
+	//TB0CCR3 = ;							  // RED LED DUTY CYCLE...Gets Set In UART ISR
+	//TB0CCR4 = ;							  // GREEN LED DUTY CYCLE...Gets Set In UART ISR
+	//TB0CCR5 = ; 							  // BLUE LED DUTY CYCLE...Gets Set In UART ISR
 	TB0CCTL1 |= OUTMOD_7;					  // Reset/Set mode...QUESTIONABLE?!?
 	TB0CTL |= CCIE;							  // Enable TB0 Interrupts
-
-
 }
 
 void UARTSetup()
