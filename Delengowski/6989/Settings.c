@@ -8,10 +8,10 @@ nonvolatile unsigned int messages[80];		    // For Storing Received Bytes from R
 #define red   TB0CCR3 							// For Controlling RED LED DUTY CYCLE
 #define green TB0CCR4 							// For Controlling GREEN LED DUTY CYCLE
 #define blue  TB0CCR5 							// For Controlling BLUE LED DUTY CYCLE
-#define LED1ON P1OUT |= BIT0					// Indicates Start of Receive Cylce
-#define LED1OFF P1OUT &= ~BIT0					// Indicates End of Receive Cycle
-#define LED2ON P9OUT |= BIT7					// Indicates Start of Transmission Cycle
-#define LED2OFF P9OUT &= ~BIT7					// Indicates End of Transmission Cycle
+#define LED1ON P1OUT |= BIT0					//<comment on use>
+#define LED1OFF P1OUT &= ~BIT0					//<comment on use>
+#define LED2ON P9OUT |= BIT7					//<comment on use>
+#define LED2OFF P9OUT &= ~BIT7					//<comment on use>
 #define RECEIVED UCA0RXBUF						// Byte Received Buffer
 #define TRANSMIT UCA0TXBUF						// Transmit Byte Buffer
 
