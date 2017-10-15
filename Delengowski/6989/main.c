@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-#include <msp430.h> 
-
-
-/**
- * main.c
- */
-int main(void)
-{
-	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
-	
-	return 0;
-=======
 #include <msp430.h>
 
 int main(void)
@@ -79,5 +66,4 @@ __interrupt void USCI_A0_ISR(void)
             break;
         }
   }
->>>>>>> 8bafb957d275e9c399e34e322fbff8a1db5c7238
 }
