@@ -1,0 +1,77 @@
+#define red   TB0CCR3
+#define green TB0CCR4
+#define blue  TB0CCR5
+
+void TimerB0Setup();
+void UARTSetup();
+void GPIOSetup();
+
+int main(void)
+{
+	WDTCTL = WDTPW | WDTHOLD;   // Stop Watchdog
+	PM5CTL0 &= ~LOCKLPM5;   	// Disable the GPIO power-on default high-impedance mode to activate
+  								// previously configured port settings
+
+  	TimerB0Setup();
+  	UARTSetup();
+  	GPIOSetup;
+
+	__bis_SR_register(LPM3_bits | GIE);       // Enter LPM3, interrupts enabled
+	__no_operation();                         // For debugger
+ 	 
+}
+
+
+
+void TimerB0Setup()
+{
+	TB0CCR0 = 255;							  // Count Up To 
+	TB0CTL |= TBSSEL_2 + MC_1 + TBCLR;		  // SMCLK (1MHz) Up Mode Clear Timer
+	TB0CCR3 = ;								  // RED LED DUTY CYCLE
+	TB0CCR4 = ;								  // GREEN LED DUTY CYCLE
+	TB0CCR5 = ; 							  // BLUE LED DUTY CYCLE
+	TB0CCTL1 |= OUTMOD_7;					  // Reset/Set mode...QUESTIONABLE?!?
+	TB0CTL |= CCIE;							  // Enable TB0 Interrupts
+
+
+}
+
+void UARTSetup()
+{
+	// Startup clock system with max DCO setting ~8MHz
+  CSCTL0_H = CSKEY >> 8;                    // Unlock clock registers
+  CSCTL1 = DCOFSEL_3 | DCORSEL;             // Set DCO to 8MHz
+  CSCTL2 = SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK;
+  CSCTL3 = DIVA__1 | DIVS__1 | DIVM__1;     // Set all dividers
+  CSCTL0_H = 0;                             // Lock CS registers
+
+  // Configure USCI_A0 for UART mode
+  UCA0CTLW0 = UCSWRST;                      // Put eUSCI in reset
+  UCA0CTLW0 |= UCSSEL__SMCLK;               // CLK = SMCLK
+  // Baud Rate calculation
+  // 8000000/(16*9600) = 52.083
+  // Fractional portion = 0.083
+  // User's Guide Table 21-4: UCBRSx = 0x04
+  // UCBRFx = int ( (52.083-52)*16) = 1
+  UCA0BR0 = 52;                             // 8000000/16/9600
+  UCA0BR1 = 0x00;
+  UCA0MCTLW |= UCOS16 | UCBRF_1 | 0x4900;
+  UCA0CTLW0 &= ~UCSWRST;                    // Initialize eUSCI
+  UCA0IE |= UCRXIE;                         // Enable USCI_A0 RX interrupt
+}
+
+void GPIOSetup()
+{
+	// Configure GPIO
+  P2SEL0 |= BIT0 | BIT1;                    // USCI_A0 UART operation
+  P2SEL1 &= ~(BIT0 | BIT1);
+
+  P2SEL0 |= BIT4;							// Direct TB0CCR3 (RED LED) to P2.4 
+  P2SEL1 &= ~BIT4;
+
+  P2SEL0 |= BIT5;							// Direct TB0CCR4 (GREEN LED) to P2.5
+  P2SEL1 &= ~BIT5;
+
+  P2SEL0 |= BIT6;							// Direct TB0CCR5 (BLUE LED) to P2.6 
+  P2SEL1 &= ~BIT6;
+}
