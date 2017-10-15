@@ -60,10 +60,10 @@
 //
 //                MSP430FR6989
 //             -----------------
-//       RST -|     P2.0/UCA0TXD|----> PC (echo)
+//       RST -|     P2.0/UCA1TXD|----> PC (echo)
 //            |                 |
 //            |                 |
-//            |     P2.1/UCA0RXD|<---- PC
+//            |     P2.1/UCA1RXD|<---- PC
 //            |                 |
 //
 //   William Goh
@@ -73,18 +73,18 @@
 //******************************************************************************
 #include <msp430.h>
 
-int num_of_bytes;
-int red,green,blue;
-int byte_count=0;
-int messages[80];
-unsigned int i = 0;
+volatile unsigned int num_of_bytes;
+volatile unsigned int red,green,blue;
+volatile unsigned int byte_count=0;
+volatile unsigned int messages[80];
+volatile unsigned int i = 0;
 int main(void)
 {
   WDTCTL = WDTPW | WDTHOLD;                 // Stop Watchdog
 
   // Configure GPIO
-  P2SEL0 |= BIT0 | BIT1;                    // USCI_A0 UART operation
-  P2SEL1 &= ~(BIT0 | BIT1);
+  P3SEL0 |= BIT4 | BIT5;                    // USCI_A0 UART operation
+  P3SEL1 &= ~(BIT4 | BIT5);
 
   P1DIR |= BIT0;
   P1OUT &= ~BIT0;
@@ -102,27 +102,27 @@ int main(void)
   CSCTL0_H = 0;                             // Lock CS registers
 
   // Configure USCI_A0 for UART mode
-  UCA0CTLW0 = UCSWRST;                      // Put eUSCI in reset
-  UCA0CTLW0 |= UCSSEL__SMCLK;               // CLK = SMCLK
+  UCA1CTLW0 = UCSWRST;                      // Put eUSCI in reset
+  UCA1CTLW0 |= UCSSEL__SMCLK;               // CLK = SMCLK
   // Baud Rate calculation
   // 8000000/(16*9600) = 52.083
   // Fractional portion = 0.083
   // User's Guide Table 21-4: UCBRSx = 0x04
   // UCBRFx = int ( (52.083-52)*16) = 1
-  UCA0BR0 = 52;                             // 8000000/16/9600
-  UCA0BR1 = 0x00;
-  UCA0MCTLW |= UCOS16 | UCBRF_1 | 0x4900;
-  UCA0CTLW0 &= ~UCSWRST;                    // Initialize eUSCI
-  UCA0IE |= UCRXIE;                         // Enable USCI_A0 RX interrupt
+  UCA1BR0 = 52;                             // 8000000/16/9600
+  UCA1BR1 = 0x00;
+  UCA1MCTLW |= UCOS16 | UCBRF_1 | 0x4900;
+  UCA1CTLW0 &= ~UCSWRST;                    // Initialize eUSCI
+  UCA1IE |= UCRXIE;                         // Enable USCI_A0 RX interrupt
 
   __bis_SR_register(LPM3_bits | GIE);       // Enter LPM3, interrupts enabled
   __no_operation();                         // For debugger
 }
 
-#pragma vector=USCI_A0_VECTOR
-__interrupt void USCI_A0_ISR(void)
+#pragma vector=USCI_A1_VECTOR
+__interrupt void USCI_A1_ISR(void)
 {
-  switch(__even_in_range(UCA0IV, USCI_UART_UCTXCPTIFG))
+  switch(__even_in_range(UCA1IV, USCI_UART_UCTXCPTIFG))
   {
     case USCI_NONE: break;
     case USCI_UART_UCRXIFG:
@@ -130,7 +130,7 @@ __interrupt void USCI_A0_ISR(void)
         if(byte_count == 0)
         {
 
-            num_of_bytes = UCA0RXBUF;
+            num_of_bytes = UCA1RXBUF;
             byte_count++;
         }
         else if((byte_count > 0) && (byte_count <= 3))
@@ -138,13 +138,13 @@ __interrupt void USCI_A0_ISR(void)
             switch(byte_count)
             {
             case 1:
-                red = UCA0RXBUF;
+                red = UCA1RXBUF;
                 break;
             case 2:
-                green = UCA0RXBUF;
+                green = UCA1RXBUF;
                 break;
             case 3:
-                blue = UCA0RXBUF;
+                blue = UCA1RXBUF;
                 break;
             }
             byte_count++;
@@ -157,13 +157,16 @@ __interrupt void USCI_A0_ISR(void)
                messages[i] = num_of_bytes -3;
             }
             i++;
-            messages[i] = UCA0RXBUF;
+            messages[i] = UCA1RXBUF;
             byte_count++;
         }
         else if(byte_count > num_of_bytes)
         {
             i = 0;
             byte_count = 0;
+            UCA1IE &= ~UCRXIE;                         // Disable USCI_A1 RX interrupt
+            UCA1IE |= UCTXIE;                         // Enable USCI_A1 TX interrupt
+            UCA1TXBUF = messages[i];
             P1OUT &= ~BIT0;
         }
       __no_operation();
@@ -172,13 +175,17 @@ __interrupt void USCI_A0_ISR(void)
         P9OUT |= BIT7;
         if(i <= num_of_bytes)
         {
-            UCA0TXBUF = messages[i];
             i++;
+            UCA1TXBUF = messages[i];
+
         }
         else if(i > num_of_bytes)
         {
             P9OUT &= ~BIT7;
             i = 0;
+            num_of_bytes = 0;
+            UCA1IE |= UCRXIE;                         // Enable USCI_A1 RX interrupt
+            UCA1IE &= ~UCTXIE;                         // DISABLE USCI_A1 TX interrupt
         }
     break;
     case USCI_UART_UCSTTIFG: break;

@@ -1,7 +1,7 @@
 ******************************************************************************
                   MSP430 Linker PC v16.9.4                     
 ******************************************************************************
->> Linked Sun Oct 15 12:23:33 2017
+>> Linked Sun Oct 15 15:37:03 2017
 
 OUTPUT FILE NAME:   <FR6989_UART.out>
 ENTRY POINT SYMBOL: "_c_int00_noinit_noargs_noexit_mpu"  address: 00004416
@@ -186,7 +186,7 @@ USCI_B1    0    0000ffe2    00000002
                   0000ffe2    00000002     rts430x_lc_rd_eabi.lib : int41.obj (.int41)
 
 USCI_A1    0    0000ffe4    00000002     
-                  0000ffe4    00000002     rts430x_lc_rd_eabi.lib : int42.obj (.int42)
+                  0000ffe4    00000002     main.obj (.int42)
 
 TIMER0_A1 
 *          0    0000ffe6    00000002     
@@ -203,7 +203,7 @@ USCI_B0    0    0000ffec    00000002
                   0000ffec    00000002     rts430x_lc_rd_eabi.lib : int46.obj (.int46)
 
 USCI_A0    0    0000ffee    00000002     
-                  0000ffee    00000002     main.obj (.int47)
+                  0000ffee    00000002     rts430x_lc_rd_eabi.lib : int47.obj (.int47)
 
 ESCAN_IF   0    0000fff0    00000002     
                   0000fff0    00000002     rts430x_lc_rd_eabi.lib : int48.obj (.int48)
@@ -272,11 +272,11 @@ MODULE SUMMARY
        int39.obj          0      2         0      
        int40.obj          0      2         0      
        int41.obj          0      2         0      
-       int42.obj          0      2         0      
        int43.obj          0      2         0      
        int44.obj          0      2         0      
        int45.obj          0      2         0      
        int46.obj          0      2         0      
+       int47.obj          0      2         0      
        int48.obj          0      2         0      
        int49.obj          0      2         0      
        int50.obj          0      2         0      
