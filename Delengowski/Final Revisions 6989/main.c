@@ -9,7 +9,7 @@ volatile unsigned int num_of_bytes;          // Takes on the Value of Received B
 volatile unsigned int byte_count = 0;        // For Counting Number of Bytes Received through RXBUF
 volatile unsigned int index_count = 0;       // For Assigning Received Bytes to messages[i] Array
 volatile unsigned int messages[80];          // For Storing Received Bytes from RXBUF...at most we will receive 80 bytes,
-                                                // Later Used for Transmitting Messages to TXBUF
+                                             // Later Used for Transmitting Messages to TXBUF
 
 #define red   TB0CCR3                           // For Controlling RED LED DUTY CYCLE
 #define green TB0CCR4                           // For Controlling GREEN LED DUTY CYCLE
@@ -188,7 +188,7 @@ void GPIOSetup()
   P2SEL0 |= BIT6;                           // Direct TB0CCR5 (BLUE LED) to P2.6
   P2SEL1 &= ~BIT6;
 
-  P2DIR |= (BIT4 + BIT5 + BIT6)             // Set P2.4,P2.5,P2.6 to Output
+  P2DIR |= (BIT4 + BIT5 + BIT6);             // Set P2.4,P2.5,P2.6 to Output
 }
 
 void LEDSetup()
