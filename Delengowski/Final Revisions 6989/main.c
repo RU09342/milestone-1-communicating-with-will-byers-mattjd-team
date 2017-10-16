@@ -1,5 +1,6 @@
 //MILESTONE 1
 //Authors: The Polish Brotherhood: Delengowski & Szymczak
+//Device: MSP430FR6989
 
 
 #include <msp430.h>
@@ -57,7 +58,7 @@ __interrupt void USCI_A1_ISR(void)
         }
         case USCI_UART_UCRXIFG:
         {
-            LED1ON;                                                     // Indicate We Are Receiving Bytes
+            LED1ON;                                                     // Indicate We Are Receiving Bytes (Wont See Unless Using Breaks)
             if(byte_count == 0)                                         // Store First Byte Received, Has Number of Bytes to be Received
             {
                 num_of_bytes = RECEIVED;
@@ -110,7 +111,7 @@ __interrupt void USCI_A1_ISR(void)
         }
         case USCI_UART_UCTXIFG:
         {
-            LED2ON;                                                     // Indicate Transmission Started
+            LED2ON;                                                     // Indicate Transmission Started (Wont See Unless Using Breaks)
             if(index_count < (messages[0] - 1))
             {
                 index_count++;
@@ -143,7 +144,7 @@ void TimerB0Setup()
     TB0CTL |= TBSSEL_2 + MC_1 + TBCLR;       // SMCLK (1MHz) Up Mode Clear Timer
     TB0CCR3 = 0;                             // RED LED DUTY CYCLE...Changed Set In UART RX ISR
     TB0CCR4 = 0;                             // GREEN LED DUTY CYCLE...Changed Set In UART RX ISR
-    TB0CCR5 = 0;                             // BLUE LED DUTY CYCLE...Changeed Set In UART RX ISR
+    TB0CCR5 = 0;                             // BLUE LED DUTY CYCLE...Changed Set In UART RX ISR
     TB0CCTL3 |= OUTMOD_3;                    // Set/Reset Mode
     TB0CCTL4 |= OUTMOD_3;                    // Set/Reset Mode
     TB0CCTL5 |= OUTMOD_3;                    // Set/Reset Mode
@@ -171,6 +172,8 @@ void UARTSetup()
   UCA1MCTLW |= UCOS16 | UCBRF_1 | 0x4900;
   UCA1CTLW0 &= ~UCSWRST;                    // Initialize eUSCI
   UCA1IE |= UCRXIE;                         // Enable USCI_A1 RX interrupt
+
+  FRCTL0 = FWPW | NWAITS_0;                // Removes Warning #10421-D, FWPW is FRAM password, NWAITS_0 adds 0 wait states to FRAM, changes nothing, simply removes warning
 }
 
 void GPIOSetup()
